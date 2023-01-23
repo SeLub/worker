@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
- 
+let {Worker} = require('worker_threads')
+
 let counter = 0
  
 app.get('/',(req,res) => {
@@ -9,11 +10,10 @@ app.get('/',(req,res) => {
 })
  
 app.get('/heavy',(req,res) => {
-for(let i=0;i<1e17;i++){
-    counter++;
-}
-res.status(200).json({counter})
- 
+      const worker = new Worker('./worker.js')
+      worker.on('message',(data) => {
+            res.status(200).json({data})
+          })
 })
 
 app.listen(3000,() => {
